@@ -1,0 +1,30 @@
+-- 🚀 Customer Behavior & Flight Patterns
+
+-- 1. Who are the most frequent flyers? List the top 10 customers by total number of flights over all time.
+
+SELECT loyalty_number AS "Loyalty Numbers",
+  flights_booked AS "Number of Flights"
+FROM customer_flight_activity
+WHERE flights_booked >= 10
+ORDER BY flights_booked DESC 
+LIMIT 10 ;
+
+SELECT MAX(flights_booked)
+FROM customer_flight_activity ;
+
+-- returns 21
+
+-- 2. How many flights are booked with companions? 
+-- Aggregate the number or percentage of companion flights across all customers or per loyalty tier.
+
+SELECT 
+  H.loyalty_card,
+  SUM(F.flights_with_companions) AS total_companion_flights,
+  SUM(F.total_flights) AS total_flights,
+  ROUND(SUM(F.flights_with_companions) * 100.0 / NULLIF(SUM(F.total_flights), 0), 2) AS percentage_with_companions
+FROM customer_flight_activity AS F
+JOIN customer_loyalty_history AS H 
+ON F.loyalty_number = H.loyalty_number
+GROUP BY H.loyalty_card
+ORDER BY percentage_with_companions DESC ;
+
