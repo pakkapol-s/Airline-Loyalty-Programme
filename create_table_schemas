@@ -1,0 +1,43 @@
+-- create a customer_flight_activity table
+
+-- Drop the table if it already exists, to remove the old primary key constraint
+DROP TABLE IF EXISTS customer_flight_activity;
+
+-- Recreate the table with the new column names (lowercase with underscores)
+CREATE TABLE customer_flight_activity (
+    loyalty_number INT NOT NULL, 
+    year INT NOT NULL,
+    month INT NOT NULL,
+    flights_booked INT,
+    flights_with_companions INT,
+    total_flights INT,
+    distance INT,
+    points_accumulated FLOAT,
+    points_redeemed INT,
+    dollar_cost_points_redeemed INT,
+    PRIMARY KEY (loyalty_number, year, month) -- Composite Primary Key
+);
+
+-- Create a customer_loyalty_history table
+
+-- Drop the table if it already exists, to remove any old definition
+DROP TABLE IF EXISTS customer_loyalty_history;
+
+CREATE TABLE customer_loyalty_history (
+    loyalty_number       BIGINT PRIMARY KEY,
+    country              TEXT,
+    province             TEXT,
+    city                 TEXT,
+    postal_code          TEXT,
+    gender               TEXT,
+    education            TEXT,
+    salary               NUMERIC(10, 2),
+    marital_status       TEXT,
+    loyalty_card         TEXT,
+    clv                  NUMERIC(10, 2),
+    enrollment_type      TEXT,
+    enrollment_year      INTEGER,
+    enrollment_month     INTEGER,
+    cancellation_year    INTEGER,
+    cancellation_month   INTEGER
+);
