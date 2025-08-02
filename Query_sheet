@@ -15,6 +15,12 @@ FROM customer_flight_activity ;
 -- returns 21
 
 -- 2. How many flights are booked with companions? 
+
+SELECT SUM(flights_with_companions) AS total_companion_flights
+FROM customer_flight_activity ;
+
+-- returns 416207
+
 -- Aggregate the number or percentage of companion flights across all customers or per loyalty tier.
 
 SELECT 
@@ -27,4 +33,42 @@ JOIN customer_loyalty_history AS H
 ON F.loyalty_number = H.loyalty_number
 GROUP BY H.loyalty_card
 ORDER BY percentage_with_companions DESC ;
+
+
+
+-- 3. What is the average distance flown by customers in each province?
+
+SELECT H.province,
+  ROUND(AVG(F.distance), 2) AS avg_distance_flown
+FROM customer_flight_activity AS F
+JOIN customer_loyalty_history AS H
+ON F.loyalty_number = H.loyalty_number
+GROUP BY H.province
+ORDER BY avg_distance_flown DESC ;
+
+
+-- 4. Are there seasonal trends in flight bookings?
+
+SELECT F.MONTH,
+  SUM(F.flights_booked) AS total_flights_booked
+FROM customer_flight_activity AS F
+GROUP BY F.month
+ORDER BY total_flights_booked DESC ;
+
+-- June, August, and July are the top 3
+
+-- 💰 Loyalty Points & Financials
+
+-- 5. Which loyalty tier (Star vs Aurora) accumulates and redeems the most points?
+
+SELECT H.loyalty_card,
+  SUM(F.points_redeemed) AS total_points_redeemed,
+  SUM(F.points_accumulated) AS total_points_accumulated
+FROM customer_flight_activity AS F
+JOIN customer_loyalty_history AS H
+ON F.loyalty_number = H.loyalty_number
+GROUP BY H.loyalty_card
+ORDER BY total_points_accumulated DESC ; 
+
+-- Star, Nova, Aura respectively
 
