@@ -12,14 +12,14 @@ LIMIT 10 ;
 SELECT MAX(flights_booked)
 FROM customer_flight_activity ;
 
--- returns 21
+-- returned 21
 
 -- 2. How many flights are booked with companions? 
 
 SELECT SUM(flights_with_companions) AS total_companion_flights
 FROM customer_flight_activity ;
 
--- returns 416207
+-- returned 416207
 
 -- Aggregate the number or percentage of companion flights across all customers or per loyalty tier.
 
@@ -70,5 +70,173 @@ ON F.loyalty_number = H.loyalty_number
 GROUP BY H.loyalty_card
 ORDER BY total_points_accumulated DESC ; 
 
--- Star, Nova, Aura respectively
+-- returned Star, Nova, Aura respectively
+
+-- 6. Is there a relationship between customer salary and points accumulated or redeemed?
+
+-- Divide by salary ranges
+
+SELECT
+    CASE
+        WHEN H.salary < 50000 THEN 'Low Salary (< $50k)'
+        WHEN H.salary >= 50000 AND H.salary < 100000 THEN 'Medium Salary ($50k - $100k)'
+        ELSE 'High Salary (>$100k)'
+    END AS salary_bracket,
+    ROUND(AVG(F.points_accumulated)::numeric, 2) AS avg_points_accumulated,
+    ROUND(AVG(F.points_redeemed)::numeric, 2) AS avg_points_redeemed
+FROM customer_loyalty_history AS H
+JOIN customer_flight_activity AS F
+ON H.loyalty_number = F.loyalty_number
+GROUP BY salary_bracket
+ORDER BY MIN(H.salary);
+
+-- Divide ba salary quantiles
+
+WITH CustomerQuantiles AS (
+    SELECT
+        H.loyalty_number,
+        H.salary,
+        F.points_accumulated,
+        F.points_redeemed,
+        -- This function divides all customers into 4 equal groups based on their salary
+        NTILE(4) OVER (ORDER BY H.salary) AS salary_quantile
+    FROM
+        customer_loyalty_history AS H
+    JOIN
+        customer_flight_activity AS F
+        ON H.loyalty_number = F.loyalty_number
+)
+SELECT
+    salary_quantile,
+    ROUND(AVG(points_accumulated)::numeric, 2) AS avg_points_accumulated,
+    ROUND(AVG(points_redeemed)::numeric, 2) AS avg_points_redeemed,
+    COUNT(DISTINCT loyalty_number) AS num_of_customers
+    -- COUNT(loyalty_number) AS num_of_customers
+FROM CustomerQuantiles
+GROUP BY salary_quantile
+ORDER BY salary_quantile ;
+
+
+-- 7. What’s the average 'dollar cost of points redeemed' per customer, and how does that differ by region or card type?
+
+-- By loyalty card types
+
+SELECT H.loyalty_card,
+  ROUND(AVG(F.dollar_cost_points_redeemed), 2) AS dollor_cost_points_redeemed
+FROM customer_flight_activity AS F
+JOIN customer_loyalty_history AS H 
+ON F.loyalty_number = H.loyalty_number
+GROUP BY H.loyalty_card 
+ORDER BY dollor_cost_points_redeemed DESC;
+
+-- returned Aurora =  2.52, Star = 2.51, Nova = 2.45
+
+-- Regions
+
+SELECT H.province,
+  ROUND(AVG(F.dollar_cost_points_redeemed), 2) AS dollor_cost_points_redeemed
+FROM customer_flight_activity AS F
+JOIN customer_loyalty_history AS H 
+ON F.loyalty_number = H.loyalty_number
+GROUP BY H.province
+ORDER BY dollor_cost_points_redeemed DESC;
+
+-- Regions + Loyalty card
+
+SELECT H.province,
+  H.loyalty_card,
+  ROUND(AVG(F.dollar_cost_points_redeemed), 2) AS dollor_cost_points_redeemed
+FROM customer_flight_activity AS F
+JOIN customer_loyalty_history AS H 
+ON F.loyalty_number = H.loyalty_number
+GROUP BY H.province, H.loyalty_card
+ORDER BY dollor_cost_points_redeemed DESC;
+
+
+-- 8. Which customers have high point accumulation but low redemption?
+-- Identify potential upsell or engagement targets.
+
+WITH CustomerPointsSummary AS (
+    SELECT
+        F.loyalty_number,
+        SUM(F.points_accumulated) AS total_points_accumulated,
+        SUM(F.points_redeemed) AS total_points_redeemed
+    FROM customer_flight_activity AS F
+    GROUP BY F.loyalty_number
+)
+SELECT
+    CPS.loyalty_number,
+    H.loyalty_card,
+    CPS.total_points_accumulated,
+    CPS.total_points_redeemed
+FROM CustomerPointsSummary AS CPS
+JOIN customer_loyalty_history AS H
+ON CPS.loyalty_number = H.loyalty_number
+WHERE
+    -- Condition for "high accumulation" (e.g., more than 1000 points)
+    CPS.total_points_accumulated > 1000
+    AND
+    -- Condition for "low redemption" (e.g., redemption ratio is less than 5%)
+    (CAST(CPS.total_points_redeemed AS DECIMAL) / NULLIF(CPS.total_points_accumulated, 0)) < 0.05
+ORDER BY CPS.total_points_accumulated DESC ;
+
+
+-- 🧑‍🤝‍🧑 Customer Demographics & Segmentation
+
+-- 9. How does marital status or gender relate to flight behavior or loyalty points usage?
+
+WITH CustomerStatus AS (
+  SELECT
+    H.marital_status,
+    SUM(F.points_accumulated) AS total_points_accumulated,
+    SUM(F.points_redeemed) AS total_points_redeemed
+  FROM customer_flight_activity AS F
+  JOIN customer_loyalty_history AS H 
+  ON F.loyalty_number = H.loyalty_number
+  GROUP BY H.marital_status
+)
+SELECT 
+  CS.marital_status,
+  CS.total_points_accumulated,
+  CS.total_points_redeemed
+FROM CustomerStatus AS CS 
+ORDER BY CS.total_points_accumulated DESC;
+
+
+-- 10. Which education levels are most associated with high CLV or frequent travel?
+-- Customer lifetime value - total invoice value for all flights ever booked by member
+
+SELECT H.education,
+  ROUND(AVG(H.clv),2) AS avg_clv
+FROM customer_flight_activity AS F
+JOIN customer_loyalty_history AS H 
+ON F.loyalty_number = H.loyalty_number
+GROUP BY H.education
+ORDER BY avg_clv DESC ;
+
+-- Bachelor, Doctor, High School or Below, College, Master respectively
+
+-- 11. Are there provinces with significantly higher or lower CLV averages?
+
+SELECT H.province AS Province,
+  ROUND(AVG(H.clv),2) AS AVG_of_clv
+FROM customer_loyalty_history AS H
+GROUP BY H.province 
+ORDER BY AVG_of_clv DESC;
+
+
+SELECT ROUND(AVG(H.clv),2)
+FROM customer_loyalty_history AS H ;
+
+
+SELECT
+    CASE
+        WHEN H.clv < AVG(H.clv) THEN 'Lower Average'
+        WHEN H.clv >= AVG(H.clv) THEN 'Upper Average'
+    END AS clv_bracket,
+    H.province
+FROM customer_loyalty_history AS H
+GROUP BY H.province ;
+
+
 
