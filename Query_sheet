@@ -218,25 +218,117 @@ ORDER BY avg_clv DESC ;
 
 -- 11. Are there provinces with significantly higher or lower CLV averages?
 
-SELECT H.province AS Province,
-  ROUND(AVG(H.clv),2) AS AVG_of_clv
-FROM customer_loyalty_history AS H
-GROUP BY H.province 
-ORDER BY AVG_of_clv DESC;
-
-
+-- Avg clv
 SELECT ROUND(AVG(H.clv),2)
 FROM customer_loyalty_history AS H ;
 
+-- return 7988.90
+
+-- Below average
 
 SELECT
+    province,
+    ROUND(AVG(clv), 2) AS province_avg_clv
+FROM
+    customer_loyalty_history
+GROUP BY
+    province
+HAVING
+    AVG(clv) < (SELECT AVG(clv) FROM customer_loyalty_history)
+ORDER BY
+    province_avg_clv DESC;
+
+-- Above or equal average
+
+SELECT
+    province,
+    ROUND(AVG(clv), 2) AS province_avg_clv
+FROM
+    customer_loyalty_history
+GROUP BY
+    province
+HAVING
+    AVG(clv) >= (SELECT AVG(clv) FROM customer_loyalty_history)
+ORDER BY
+    province_avg_clv DESC;
+
+
+-- 📉 Churn & Retention
+-- 11. What’s the average CLV and flight activity difference between churned and active customers?
+
+SELECT 
     CASE
-        WHEN H.clv < AVG(H.clv) THEN 'Lower Average'
-        WHEN H.clv >= AVG(H.clv) THEN 'Upper Average'
-    END AS clv_bracket,
-    H.province
-FROM customer_loyalty_history AS H
-GROUP BY H.province ;
+      WHEN cancellation_year IS NULL THEN 'Active'
+      WHEN cancellation_year IS NOT NULL THEN 'Churned'
+    END AS Customer_status,
+    ROUND(AVG(clv),2) AS Average_clv
+FROM
+    customer_loyalty_history
+GROUP BY
+    Customer_status;
 
 
+-- 13. Among customers who cancelled, how many had low activity or low point redemption in the prior months?
 
+WITH ChurnedCustomersActivities AS (
+    SELECT
+        H.loyalty_number,
+        H.cancellation_year,
+        H.cancellation_month,
+        F.flights_booked,
+        F.points_redeemed
+    FROM
+        customer_loyalty_history AS H
+    JOIN
+        customer_flight_activity AS F
+        ON H.loyalty_number = F.loyalty_number
+    WHERE
+        -- Filter for churned customers
+        H.cancellation_year IS NOT NULL
+        -- Filter for activity that occurred before cancellation
+        AND (
+            (F.year < H.cancellation_year) OR
+            (F.year = H.cancellation_year AND F.month < H.cancellation_month)
+        )
+),
+ChurnedCustomersSummary AS (
+    SELECT
+        loyalty_number,
+        SUM(flights_booked) AS total_flights_booked,
+        SUM(points_redeemed) AS total_points_redeemed
+    FROM
+        ChurnedCustomersActivities
+    GROUP BY
+        loyalty_number
+)
+SELECT
+    COUNT(*) AS total_customers_with_low_activity_or_redemption
+FROM
+    ChurnedCustomersSummary
+WHERE
+    -- Check for "low activity" or "low redemption"
+    total_flights_booked < 5 OR total_points_redeemed < 50;
+
+
+-- 14. Is there a correlation between enrollment type (Standard vs Promotion) and churn rate?
+
+SELECT
+    enrollment_type,
+    COUNT(loyalty_number) AS total_customers,
+    COUNT(CASE WHEN cancellation_year IS NOT NULL THEN 1 END) AS churned_customers,
+    -- Calculate the churn rate by casting the numerator to numeric
+    CAST(COUNT(CASE WHEN cancellation_year IS NOT NULL THEN 1 END) AS NUMERIC)
+    / COUNT(loyalty_number) AS churn_rate
+FROM
+    customer_loyalty_history
+GROUP BY
+    enrollment_type;
+
+
+/*
+📊 Marketing & Promotion Impact
+-- 15. Did customers enrolled through promotions behave differently from standard enrollees?
+-- Compare their flight frequency, points, and cancellation rates.
+-- 16. Which enrollment year brought in the highest average CLV?
+-- 17. How do customer activities change in their first year compared to subsequent years?
+/*
