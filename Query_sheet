@@ -317,18 +317,64 @@ SELECT
     COUNT(loyalty_number) AS total_customers,
     COUNT(CASE WHEN cancellation_year IS NOT NULL THEN 1 END) AS churned_customers,
     -- Calculate the churn rate by casting the numerator to numeric
-    CAST(COUNT(CASE WHEN cancellation_year IS NOT NULL THEN 1 END) AS NUMERIC)
-    / COUNT(loyalty_number) AS churn_rate
+    CAST(COUNT(CASE WHEN cancellation_year IS NOT NULL THEN 1 END) AS NUMERIC) / COUNT(loyalty_number) AS churn_rate
 FROM
     customer_loyalty_history
 GROUP BY
     enrollment_type;
 
-
-/*
-📊 Marketing & Promotion Impact
+-- 📊 Marketing & Promotion Impact
 -- 15. Did customers enrolled through promotions behave differently from standard enrollees?
 -- Compare their flight frequency, points, and cancellation rates.
+
+-- points
+
+SELECT H.enrollment_type,
+  AVG(F.points_accumulated) AS avg_points_accom,
+  AVG(F.points_redeemed) AS avg_points_redeemed
+FROM customer_flight_activity AS F
+JOIN customer_loyalty_history AS H 
+ON F.loyalty_number = H.loyalty_number
+GROUP BY H.enrollment_type
+
+-- flights booked
+
+SELECT 
+    CASE
+      WHEN H.enrollment_type = '2018 Promotion' THEN '2018 Promotion'
+      WHEN H.enrollment_type = 'Standard' THEN 'Standard'
+    END AS Customer_status,
+    ROUND(AVG(F.flights_booked),2) AS avg_flights_booked
+FROM customer_flight_activity AS F
+JOIN customer_loyalty_history AS H 
+ON F.loyalty_number = H.loyalty_number
+GROUP BY Customer_status;
+
+-- returned 2018 promo = 3.20, Standard = 4.19.
+
+
 -- 16. Which enrollment year brought in the highest average CLV?
+
+SELECT enrollment_year,
+  ROUND(AVG(clv), 2) AS average_clv
+FROM customer_loyalty_history
+GROUP BY enrollment_year
+ORDER BY average_clv DESC;
+
 -- 17. How do customer activities change in their first year compared to subsequent years?
-/*
+
+SELECT
+    CASE
+        WHEN F.year = H.enrollment_year THEN 'First Year'
+        ELSE 'Subsequent Years'
+    END AS activity_period,
+    ROUND(AVG(F.total_flights), 2) AS avg_total_flights,
+    ROUND(AVG(F.distance), 2) AS avg_distance,
+    ROUND(AVG(F.flights_booked), 2) AS avg_flights_booked,
+    ROUND(AVG(F.flights_with_companions), 2) AS avg_flights_with_companions,
+    ROUND(AVG(F.points_accumulated)::numeric, 2) AS avg_points_accumulated
+FROM customer_loyalty_history AS H
+JOIN customer_flight_activity AS F
+ON H.loyalty_number = F.loyalty_number
+GROUP BY activity_period
+ORDER BY activity_period;
