@@ -34,6 +34,10 @@ ON F.loyalty_number = H.loyalty_number
 GROUP BY H.loyalty_card
 ORDER BY percentage_with_companions DESC ;
 
+"loyalty_card","total_companion_flights","total_flights","percentage_with_companions"
+"Star","190265","947938","20.07"
+"Aurora","85553","427533","20.01"
+"Nova","140389","702345","19.99"
 
 
 -- 3. What is the average distance flown by customers in each province?
@@ -46,6 +50,20 @@ ON F.loyalty_number = H.loyalty_number
 GROUP BY H.province
 ORDER BY avg_distance_flown DESC ;
 
+"province","avg_distance_flown"
+"Yukon","1291.07"
+"New Brunswick","1259.40"
+"British Columbia","1219.05"
+"Alberta","1218.79"
+"Nova Scotia","1215.22"
+"Ontario","1215.17"
+"Saskatchewan","1205.60"
+"Quebec","1200.63"
+"Manitoba","1189.88"
+"Newfoundland","1182.89"
+"Prince Edward Island","1161.28"
+
+
 
 -- 4. Are there seasonal trends in flight bookings?
 
@@ -54,6 +72,21 @@ SELECT F.MONTH,
 FROM customer_flight_activity AS F
 GROUP BY F.month
 ORDER BY total_flights_booked DESC ;
+
+"month","total_flights_booked"
+7,"192602"
+6,"172528"
+8,"168516"
+12,"165327"
+5,"141538"
+9,"135813"
+3,"130425"
+10,"128785"
+11,"121766"
+4,"111988"
+1,"96604"
+2,"95717"
+
 
 -- June, August, and July are the top 3
 
@@ -69,6 +102,12 @@ JOIN customer_loyalty_history AS H
 ON F.loyalty_number = H.loyalty_number
 GROUP BY H.loyalty_card
 ORDER BY total_points_accumulated DESC ; 
+
+"loyalty_card","total_points_redeemed","total_points_accumulated"
+"Star","5673211",22467445.000000026
+"Nova","4126568",16859774.5
+"Aurora","2562347",10550164.5
+
 
 -- returned Star, Nova, Aura respectively
 
@@ -89,6 +128,12 @@ JOIN customer_flight_activity AS F
 ON H.loyalty_number = F.loyalty_number
 GROUP BY salary_bracket
 ORDER BY MIN(H.salary);
+
+"salary_bracket","avg_points_accumulated","avg_points_redeemed"
+"Low Salary (< $50k)","122.05","31.65"
+"Medium Salary ($50k - $100k)","124.11","30.33"
+"High Salary (>$100k)","124.61","31.41"
+
 
 -- Divide ba salary quantiles
 
@@ -117,6 +162,13 @@ GROUP BY salary_quantile
 ORDER BY salary_quantile ;
 
 
+"salary_quantile","avg_points_accumulated","avg_points_redeemed","num_of_customers"
+1,"122.21","30.39","4187"
+2,"124.01","30.31","4186"
+3,"125.93","30.97","5354"
+4,"124.53","31.42","4237"
+
+
 -- 7. What’s the average 'dollar cost of points redeemed' per customer, and how does that differ by region or card type?
 
 -- By loyalty card types
@@ -129,7 +181,11 @@ ON F.loyalty_number = H.loyalty_number
 GROUP BY H.loyalty_card 
 ORDER BY dollor_cost_points_redeemed DESC;
 
--- returned Aurora =  2.52, Star = 2.51, Nova = 2.45
+"loyalty_card","dollor_cost_points_redeemed"
+"Aurora","2.52"
+"Star","2.51"
+"Nova","2.45"
+
 
 -- Regions
 
@@ -141,6 +197,20 @@ ON F.loyalty_number = H.loyalty_number
 GROUP BY H.province
 ORDER BY dollor_cost_points_redeemed DESC;
 
+"province","dollor_cost_points_redeemed"
+"New Brunswick","2.53"
+"Quebec","2.53"
+"Nova Scotia","2.52"
+"Ontario","2.49"
+"Prince Edward Island","2.49"
+"British Columbia","2.49"
+"Alberta","2.45"
+"Manitoba","2.45"
+"Newfoundland","2.40"
+"Saskatchewan","2.40"
+"Yukon","2.28"
+
+
 -- Regions + Loyalty card
 
 SELECT H.province,
@@ -151,6 +221,41 @@ JOIN customer_loyalty_history AS H
 ON F.loyalty_number = H.loyalty_number
 GROUP BY H.province, H.loyalty_card
 ORDER BY dollor_cost_points_redeemed DESC;
+
+"province","loyalty_card","dollor_cost_points_redeemed"
+"Prince Edward Island","Aurora","3.74"
+"Saskatchewan","Aurora","2.82"
+"Newfoundland","Aurora","2.72"
+"Manitoba","Aurora","2.71"
+"Nova Scotia","Aurora","2.68"
+"New Brunswick","Star","2.65"
+"Manitoba","Star","2.61"
+"Nova Scotia","Nova","2.60"
+"Quebec","Nova","2.58"
+"Ontario","Star","2.52"
+"Ontario","Aurora","2.52"
+"British Columbia","Star","2.51"
+"Quebec","Star","2.51"
+"Quebec","Aurora","2.48"
+"Alberta","Aurora","2.47"
+"British Columbia","Aurora","2.47"
+"British Columbia","Nova","2.47"
+"New Brunswick","Nova","2.47"
+"Alberta","Star","2.46"
+"Ontario","Nova","2.44"
+"Alberta","Nova","2.43"
+"Newfoundland","Star","2.42"
+"Yukon","Star","2.40"
+"Nova Scotia","Star","2.39"
+"New Brunswick","Aurora","2.38"
+"Saskatchewan","Nova","2.35"
+"Prince Edward Island","Star","2.31"
+"Saskatchewan","Star","2.25"
+"Yukon","Aurora","2.24"
+"Newfoundland","Nova","2.16"
+"Yukon","Nova","2.08"
+"Prince Edward Island","Nova","2.05"
+"Manitoba","Nova","2.03"
 
 
 -- 8. Which customers have high point accumulation but low redemption?
@@ -202,6 +307,12 @@ SELECT
 FROM CustomerStatus AS CS 
 ORDER BY CS.total_points_accumulated DESC;
 
+"marital_status","total_points_accumulated","total_points_redeemed"
+"Married",29056092.48000002,"7162842"
+"Single",13383501.570000015,"3313838"
+"Divorced",7437789.949999997,"1885446"
+
+
 
 -- 10. Which education levels are most associated with high CLV or frequent travel?
 -- Customer lifetime value - total invoice value for all flights ever booked by member
@@ -213,6 +324,14 @@ JOIN customer_loyalty_history AS H
 ON F.loyalty_number = H.loyalty_number
 GROUP BY H.education
 ORDER BY avg_clv DESC ;
+
+"education","avg_clv"
+"Bachelor","8206.99"
+"Doctor","7832.92"
+"High School or Below","7707.08"
+"College","7594.57"
+"Master","7440.62"
+
 
 -- Bachelor, Doctor, High School or Below, College, Master respectively
 
@@ -238,6 +357,14 @@ HAVING
 ORDER BY
     province_avg_clv DESC;
 
+"province","province_avg_clv"
+"Nova Scotia","7983.30"
+"Ontario","7913.75"
+"Alberta","7752.79"
+"Prince Edward Island","7704.49"
+"Yukon","6771.66"
+
+
 -- Above or equal average
 
 SELECT
@@ -251,6 +378,15 @@ HAVING
     AVG(clv) >= (SELECT AVG(clv) FROM customer_loyalty_history)
 ORDER BY
     province_avg_clv DESC;
+
+"province","province_avg_clv"
+"Quebec","8160.96"
+"New Brunswick","8154.18"
+"Saskatchewan","8076.37"
+"Manitoba","8066.56"
+"Newfoundland","8025.08"
+"British Columbia","7993.73"
+
 
 
 -- 📉 Churn & Retention
@@ -266,6 +402,11 @@ FROM
     customer_loyalty_history
 GROUP BY
     Customer_status;
+
+"customer_status","average_clv"
+"Churned","8131.78"
+"Active","7968.76"
+
 
 
 -- 13. Among customers who cancelled, how many had low activity or low point redemption in the prior months?
@@ -309,6 +450,9 @@ WHERE
     -- Check for "low activity" or "low redemption"
     total_flights_booked < 5 OR total_points_redeemed < 50;
 
+"total_customers_with_low_activity_or_redemption"
+"599"
+
 
 -- 14. Is there a correlation between enrollment type (Standard vs Promotion) and churn rate?
 
@@ -322,6 +466,11 @@ FROM
     customer_loyalty_history
 GROUP BY
     enrollment_type;
+
+"enrollment_type","total_customers","churned_customers","churn_rate"
+"Standard","15766","1952","0.12381073195483952810"
+"2018 Promotion","971","115","0.11843460350154479918"
+
 
 -- 📊 Marketing & Promotion Impact
 -- 15. Did customers enrolled through promotions behave differently from standard enrollees?
@@ -337,6 +486,11 @@ JOIN customer_loyalty_history AS H
 ON F.loyalty_number = H.loyalty_number
 GROUP BY H.enrollment_type
 
+"enrollment_type","avg_points_accom","avg_points_redeemed"
+"2018 Promotion",94.81610581874358,"22.4971678681771370"
+"Standard",125.97728622246193,"31.2852869043088503"
+
+
 -- flights booked
 
 SELECT 
@@ -350,7 +504,9 @@ JOIN customer_loyalty_history AS H
 ON F.loyalty_number = H.loyalty_number
 GROUP BY Customer_status;
 
--- returned 2018 promo = 3.20, Standard = 4.19.
+"customer_status","avg_flights_booked"
+"2018 Promotion","3.20"
+"Standard","4.19"
 
 
 -- 16. Which enrollment year brought in the highest average CLV?
@@ -360,6 +516,16 @@ SELECT enrollment_year,
 FROM customer_loyalty_history
 GROUP BY enrollment_year
 ORDER BY average_clv DESC;
+
+"enrollment_year","average_clv"
+2015,"8177.79"
+2016,"8058.06"
+2013,"8045.48"
+2018,"8019.87"
+2012,"7998.54"
+2014,"7850.49"
+2017,"7776.88"
+
 
 -- 17. How do customer activities change in their first year compared to subsequent years?
 
@@ -378,3 +544,7 @@ JOIN customer_flight_activity AS F
 ON H.loyalty_number = F.loyalty_number
 GROUP BY activity_period
 ORDER BY activity_period;
+
+"activity_period","avg_total_flights","avg_distance","avg_flights_booked","avg_flights_with_companions","avg_points_accumulated"
+"First Year","3.62","844.39","2.89","0.73","85.74"
+"Subsequent Years","5.48","1286.36","4.38","1.10","131.72"
