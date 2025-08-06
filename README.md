@@ -72,4 +72,6 @@ Target these at-risk customers with retention campaigns such as limited-time bon
 
 ## Data Structure
 
-!()[]
+The dataset contained two tables, including information about customer demogramphics, and customer flight activity.
+
+![ER_diagram_img](ER_diagram.png)
