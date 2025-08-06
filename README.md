@@ -57,3 +57,19 @@ Target these at-risk customers with retention campaigns such as limited-time bon
 
 ### Reward Longevity and Enrollment Patterns
 - Customers who enrolled earlier tend to show higher CLV and lower cancellation rates. Encourage newer users to stay engaged with milestone-based incentives (e.g. "1-year loyalty badge", surprise point boosts).
+
+---
+
+## Challenges Faced & Solutions
+
+- During the data ingestion from CSV to PostgreSQL, several key challenges were overcome. Initial attempts encountered integer out of range errors, which required careful refinement of the database schema to handle large numerical values.
+
+- A more complex issue was a subtle incompatibility between pandas' pd.NA null representation and the psycopg2 driver. This problem, which manifested as a can't adapt type 'NAType' error, was resolved by explicitly converting all null values to None before insertion. This was a critical step for data integrity.
+
+- Finally, to optimize the process, a slow row-by-row insertion loop was replaced with a more efficient bulk insertion method (execute_batch). This ensured not only the correctness of the data but also the scalability of the loading pipeline.
+
+---
+
+## Data Structure
+
+!()[]
