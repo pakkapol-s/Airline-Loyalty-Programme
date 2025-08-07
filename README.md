@@ -80,8 +80,8 @@ The dataset contained two tables, including information about customer demogramp
 
 ## Technologies Used 
 
-Programming Language: Python
-Data Manipulation & Analysis: Pandas, NumPy, psycopg2
-Database and Query: PostgreSQL, SQL
-Jupyter / Kaggle Notebook
-Dashboard: Tableau Public
+- Programming Language: Python
+- Data Manipulation & Analysis: Pandas, NumPy, psycopg2
+- Database and Query: PostgreSQL, SQL
+- Jupyter / Kaggle Notebook
+- Dashboard: Tableau Public
