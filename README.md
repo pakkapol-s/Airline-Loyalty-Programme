@@ -1,4 +1,4 @@
-# Airline-Loyalty-Programme
+# Customer Loyalty Program Analysis
 
 ## Goal
 This project aims to provide a comprehensive analysis of a customer loyalty program. The primary goal is to uncover actionable insights into customer behavior, loyalty program effectiveness, and churn drivers. By answering key business questions, this project delivers a data-driven foundation for optimizing marketing strategies, improving customer retention, and enhancing the overall value of the loyalty program.
@@ -75,3 +75,13 @@ Target these at-risk customers with retention campaigns such as limited-time bon
 The dataset contained two tables, including information about customer demogramphics, and customer flight activity.
 
 ![ER_diagram_img](ER_diagram.png)
+
+---
+
+## Technologies Used 
+
+Programming Language: Python
+Data Manipulation & Analysis: Pandas, NumPy, psycopg2
+Database and Query: PostgreSQL, SQL
+Jupyter / Kaggle Notebook
+Dashboard: Tableau Public
