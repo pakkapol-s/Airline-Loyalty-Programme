@@ -77,6 +77,39 @@ The dataset contained two tables, including information about customer demogramp
 ![ER_diagram_img](ER_diagram.png)
 
 ---
+## Dashboard Summary
+
+This dashboard provides a comprehensive visual analysis of customer loyalty program data, translating complex SQL queries into an interactive and user-friendly interface. It is designed to empower stakeholders with actionable insights into customer behavior, and loyalty programme effectiveness.
+
+Key features include:
+
+- Executive KPIs: A dedicated section displays key metrics at a glance, including Average Salary, Average CLV, Average Total Flights, and Average Distance. This allows for a quick assessment of the customer base's overall value and activity.
+
+- Interactive Filters: The dashboard's strength lies in its interactivity. Users can dynamically filter the data by Marital Status, Enrollment Type, Loyalty Card, and Education level. This enables granular analysis and a deeper understanding of how different customer segments behave.
+
+- Customer Segmentation: A prominent doughnut chart visualizes the distribution of customers by Enrollment Type, while a dynamic line chart tracks the number of active versus churned users over time. These visualizations provide a clear overview of the customer base's composition and retention trends.
+
+
+- Financial and Loyalty Insights: The dashboard includes visualizations that directly address the core of the loyalty program:
+
+    - A stacked bar chart comparing Accumulated vs. Redeemed Points highlights the balance of customer engagement.
+    - A bar chart on Dollar Cost of Points Redeemed reveals the financial implications of redemptions and how it varies over time.
+
+- Behavioral Analysis: The dashboard effectively visualizes customer activity patterns:
+
+    - A line chart displays seasonal trends in booked flights, showing monthly peaks and valleys in customer travel.
+    - Another line chart tracks the number of active and churned users over time. It provides a key indicator of the loyalty program's effectiveness, showing whether the program is successfully attracting and retaining customers.
+
+Dashboard sample images:
+
+![Dashboard sample](Sample_dashboard.png)
+![Dashboard sample](Sample_dashboard_2.png)
+
+
+Dashboard in Tableau Public link:
+
+ - https://public.tableau.com/views/Loyalty_programme/Dashboard1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
+---
 
 ## Technologies Used 
 
@@ -85,3 +118,8 @@ The dataset contained two tables, including information about customer demogramp
 - Database and Query: PostgreSQL, SQL
 - Jupyter / Kaggle Notebook
 - Dashboard: Tableau Public
+
+---
+## Author 
+
+Mr. Pakkapol Satthapiti | MSC of Data Science and AI | The University of Liverpool | Feel free to connect!
