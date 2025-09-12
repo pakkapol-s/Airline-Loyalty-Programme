@@ -81,6 +81,8 @@ The dataset contained two tables, including information about customer demogramp
 
 This dashboard provides a comprehensive visual analysis of customer loyalty program data, translating complex SQL queries into an interactive and user-friendly interface. It is designed to empower stakeholders with actionable insights into customer behavior, and loyalty programme effectiveness.
 
+Click [here](https://public.tableau.com/views/Loyalty_programme/Dashboard1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link) to view the interactive dashboard.
+
 Key features include:
 
 - Executive KPIs: A dedicated section displays key metrics at a glance, including Average Salary, Average CLV, Average Total Flights, and Average Distance. This allows for a quick assessment of the customer base's overall value and activity.
@@ -106,9 +108,6 @@ Dashboard sample images:
 ![Dashboard sample](Sample_dashboard_2.png)
 
 
-Dashboard in Tableau Public link:
-
- - https://public.tableau.com/views/Loyalty_programme/Dashboard1?:language=en-GB&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link
 ---
 
 ## Technologies Used 
